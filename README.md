@@ -61,13 +61,49 @@ Simple [MCP Server](https://modelcontextprotocol.io/) to enable a human-in-the-l
 
 ## Installation
 
-### Prerequisites
+### 🚀 Quick Installation (Recommended)
+
+**Download pre-built packages from GitHub Releases:**
+
+1. **Download** the package for your operating system:
+   - **Linux**: `interactive-feedback-mcp-linux-amd64.tar.gz`
+   - **Windows**: `interactive-feedback-mcp-windows-amd64.zip`
+   - **macOS Intel**: `interactive-feedback-mcp-darwin-amd64.tar.gz`
+   - **macOS Apple Silicon**: `interactive-feedback-mcp-darwin-arm64.tar.gz`
+
+2. **Extract and install**:
+   ```bash
+   # Linux/macOS
+   tar -xzf interactive-feedback-mcp-*.tar.gz
+   cd interactive-feedback-mcp-*
+   sudo ./install.sh
+   
+   # Windows
+   # Extract zip file, then right-click install.bat → "Run as administrator"
+   ```
+
+3. **Configure Cursor MCP**:
+   ```json
+   {
+     "mcpServers": {
+       "interactive-feedback": {
+         "command": "interactive-feedback-mcp",
+         "args": []
+       }
+     }
+   }
+   ```
+
+### 🔧 Development Installation
+
+**For developers who want to build from source:**
+
+#### Prerequisites
 - Go 1.21 or later
 - Python 3.x (for desktop GUI)
 - Git
 
-### Quick Installation
-
+#### Build from source
 ```bash
 # Clone the repository
 git clone https://github.com/your-org/interactive-feedback-mcp-go.git
@@ -83,8 +119,7 @@ go build -o mcp-server-single cmd/mcp-server-single/main.go
 chmod +x mcp-server-single
 ```
 
-### Cross-platform Builds
-
+#### Cross-platform builds
 ```bash
 # Use the build script for all platforms
 ./scripts/build.sh
@@ -93,6 +128,12 @@ chmod +x mcp-server-single
 GOOS=windows GOARCH=amd64 go build -o mcp-server-single.exe cmd/mcp-server-single/main.go
 GOOS=linux GOARCH=amd64 go build -o mcp-server-single-linux cmd/mcp-server-single/main.go
 GOOS=darwin GOARCH=amd64 go build -o mcp-server-single-macos cmd/mcp-server-single/main.go
+```
+
+#### Create packages
+```bash
+# Create .zip and .tar.gz packages for distribution
+./scripts/build-packages.sh
 ```
 
 ## Configuration

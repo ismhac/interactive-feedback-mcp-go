@@ -39,3 +39,11 @@ Thumbs.db
 # Build directories
 build/
 dist/
+packages/
+
+# Release artifacts
+interactive-feedback-mcp
+interactive-feedback-mcp-*
+
+# GitHub Actions artifacts
+.github/workflows/artifacts/
