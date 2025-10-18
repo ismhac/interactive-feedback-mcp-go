@@ -3,7 +3,6 @@ package ui
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -39,11 +38,6 @@ type FeedbackApp struct {
 
 func NewFeedbackApp(projectDirectory, prompt string) (*FeedbackApp, error) {
 	myApp := app.NewWithID("com.interactivefeedback.mcp")
-	myApp.SetMetadata(&fyne.AppMetadata{
-		ID:      "com.interactivefeedback.mcp",
-		Name:    "Interactive Feedback MCP",
-		Version: "1.0.0",
-	})
 
 	configManager, err := config.NewConfigManager()
 	if err != nil {
@@ -146,7 +140,7 @@ func (fa *FeedbackApp) loadConfig() {
 }
 
 func (fa *FeedbackApp) runCommand() {
-	command := strings.TrimSpace(fa.commandEntry.Text())
+	command := strings.TrimSpace(fa.commandEntry.Text)
 	if command == "" {
 		return
 	}
@@ -215,7 +209,7 @@ func (fa *FeedbackApp) submitFeedback() {
 
 	// Save configuration
 	config := fa.configManager.LoadProjectConfig(fa.projectDirectory)
-	config.RunCommand = fa.commandEntry.Text()
+	config.RunCommand = fa.commandEntry.Text
 
 	if err := fa.configManager.SaveProjectConfig(fa.projectDirectory, config); err != nil {
 		dialog.ShowError(fmt.Errorf("failed to save config: %w", err), fa.window)

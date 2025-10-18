@@ -13,7 +13,7 @@ import (
 )
 
 type ConversationSection struct {
-	container   *container.VBox
+	container   *fyne.Container
 	historyList *widget.List
 	copyButton  *widget.Button
 	clearButton *widget.Button
@@ -50,7 +50,7 @@ func (cs *ConversationSection) createUI() {
 			}
 
 			entry := cs.entries[id]
-			container := obj.(*container.VBox)
+			container := obj.(*fyne.Container)
 
 			// Role label with styling
 			roleLabel := container.Objects[0].(*widget.Label)
@@ -149,7 +149,7 @@ func (cs *ConversationSection) clearHistory() {
 	}
 }
 
-func (cs *ConversationSection) GetContainer() *container.VBox {
+func (cs *ConversationSection) GetContainer() *fyne.Container {
 	return cs.container
 }
 
