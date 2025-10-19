@@ -29,6 +29,7 @@ __pycache__/
 # IDE files
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 
