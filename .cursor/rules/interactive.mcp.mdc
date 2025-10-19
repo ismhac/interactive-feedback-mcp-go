@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+name: Mandatory Interactive Feedback Loop
+---
+> [Strict Rule: Always use the `interactive_feedback` tool]
+>
+> 1.  **Before asking a question:** When you want to ask a clarifying question, do not ask it directly. Instead, you *must* first call the `interactive_feedback` tool to present your intended question and get user feedback.
+>
+> 2.  **Before completing a request:** When you are about to complete a user request, do not end the process. Instead, you *must* call the `interactive_feedback` tool to present your solution/output and wait for user approval.
+>
+> 3.  **Loop until empty:** You *must* continue this loop (calling `interactive_feedback`) until the user's feedback is "empty". This is the only signal that you are allowed to end the request.
