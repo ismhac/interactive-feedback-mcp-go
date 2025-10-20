@@ -33,9 +33,77 @@ class SinglePopupDesktopGUI:
             elif os.system("which msg > /dev/null 2>&1") == 0:
                 os.system(f'msg * "{title}: {message}"')
             else:
-                print(f"🔔 {title}: {message}")
+                print(f"{title}: {message}")
         except:
-            print(f"🔔 {title}: {message}")
+                print(f"{title}: {message}")
+    
+    def apply_dark_theme(self):
+        """Apply dark theme styling to the application"""
+        # Dark theme colors
+        bg_color = "#2b2b2b"  # Dark gray background
+        fg_color = "#ffffff"  # White text
+        select_bg = "#404040"  # Selection background
+        select_fg = "#ffffff"  # Selection text
+        entry_bg = "#3c3c3c"  # Entry background
+        button_bg = "#404040"  # Button background
+        button_fg = "#ffffff"  # Button text
+        button_active = "#505050"  # Button active state
+        
+        # Configure root window
+        self.root.configure(bg=bg_color)
+        
+        # Configure ttk styles
+        style = ttk.Style()
+        style.theme_use('clam')  # Use clam theme as base for better customization
+        
+        # Configure Frame style
+        style.configure('TFrame', background=bg_color)
+        
+        # Configure Label style
+        style.configure('TLabel', 
+                       background=bg_color, 
+                       foreground=fg_color,
+                       font=('Arial', 10))
+        
+        # Configure Button style with rounded corners
+        style.configure('TButton',
+                       background=button_bg,
+                       foreground=button_fg,
+                       borderwidth=0,
+                       focuscolor='none',
+                       relief='flat',
+                       padding=(10, 5))
+        
+        style.map('TButton',
+                 background=[('active', button_active),
+                           ('pressed', button_active)])
+        
+        # Configure Text widget style (for ScrolledText)
+        text_style = {
+            'bg': entry_bg,
+            'fg': fg_color,
+            'selectbackground': select_bg,
+            'selectforeground': select_fg,
+            'insertbackground': fg_color,
+            'font': ('Consolas', 9),
+            'relief': 'flat',
+            'borderwidth': 0,
+            'highlightthickness': 0
+        }
+        
+        # Store text style for later use
+        self.text_style = text_style
+    
+    def create_rounded_widget(self, parent, widget_class, **kwargs):
+        """Create a widget with rounded corners using a frame"""
+        # Create a frame with rounded appearance
+        frame = tk.Frame(parent, bg=self.text_style['bg'], relief='flat', bd=0)
+        
+        # Create the actual widget
+        widget = widget_class(frame, **kwargs)
+        widget.pack(fill='both', expand=True, padx=4, pady=4)
+        
+        return frame, widget
     
     def create_single_dialog(self):
         """Create a single unified Tkinter dialog with all information and input"""
@@ -45,8 +113,27 @@ class SinglePopupDesktopGUI:
         # Create the main window
         self.root = tk.Tk()
         self.root.title("Interactive Feedback MCP")
-        self.root.geometry("800x600")
+        
+        # Set maximized window by default (keeps title bar with close/minimize buttons)
+        try:
+            # Try maximized window first (keeps title bar)
+            self.root.state('zoomed')
+        except:
+            try:
+                # Linux fallback - maximized window
+                self.root.attributes('-zoomed', True)
+            except:
+                try:
+                    # Alternative method for maximized window
+                    self.root.wm_state('zoomed')
+                except:
+                    # Final fallback - set large geometry
+                    self.root.geometry("1200x800")
+        
         self.root.resizable(True, True)
+        
+        # Apply dark theme
+        self.apply_dark_theme()
         
         # Make window stay on top
         self.root.attributes('-topmost', True)
@@ -63,21 +150,23 @@ class SinglePopupDesktopGUI:
         main_frame.rowconfigure(1, weight=1)
         
         # Title
-        title_label = ttk.Label(main_frame, text="🎯 Interactive Feedback MCP", 
+        title_label = ttk.Label(main_frame, text="Interactive Feedback MCP", 
                                font=('Arial', 16, 'bold'))
         title_label.grid(row=0, column=0, pady=(0, 10), sticky=tk.W)
         
-        # Information display area (read-only)
-        info_text = scrolledtext.ScrolledText(main_frame, height=15, width=80, 
-                                            wrap=tk.WORD, state=tk.DISABLED)
-        info_text.grid(row=1, column=0, pady=(0, 10), sticky=(tk.W, tk.E, tk.N, tk.S))
+        # Information display area (read-only) with rounded corners
+        info_frame, info_text = self.create_rounded_widget(main_frame, scrolledtext.ScrolledText, 
+                                                          height=15, width=80, 
+                                                          wrap=tk.WORD, state=tk.DISABLED,
+                                                          **self.text_style)
+        info_frame.grid(row=1, column=0, pady=(0, 10), sticky=(tk.W, tk.E, tk.N, tk.S))
         
         # Insert information
-        info_content = f"""📁 Project: {self.project_directory}
+        info_content = f"""Project: {self.project_directory}
 
 {conversation_text}
 
-💬 Current Prompt: {self.prompt}
+Current Prompt: {self.prompt}
 
 Please provide your feedback below:"""
         
@@ -93,35 +182,67 @@ Please provide your feedback below:"""
         feedback_label = ttk.Label(feedback_frame, text="Your feedback:")
         feedback_label.grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
         
-        self.feedback_entry = tk.Text(feedback_frame, height=3, wrap=tk.WORD)
-        self.feedback_entry.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        # Feedback entry with rounded corners
+        feedback_entry_frame, self.feedback_entry = self.create_rounded_widget(feedback_frame, tk.Text, 
+                                                                              height=3, wrap=tk.WORD,
+                                                                              **self.text_style)
+        feedback_entry_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
         
         # Buttons frame
         buttons_frame = ttk.Frame(main_frame)
         buttons_frame.grid(row=3, column=0, sticky=(tk.W, tk.E))
         
         # Copy Conversation button
-        copy_btn = ttk.Button(buttons_frame, text="📋 Copy Conversation", 
+        copy_btn = ttk.Button(buttons_frame, text="Copy Conversation", 
                              command=self.copy_conversation)
         copy_btn.grid(row=0, column=0, padx=(0, 10))
         
         # Submit button
-        submit_btn = ttk.Button(buttons_frame, text="✅ Submit", 
+        submit_btn = ttk.Button(buttons_frame, text="Submit", 
                                command=self.submit_feedback)
         submit_btn.grid(row=0, column=1, padx=(0, 10))
         
         # Cancel button
-        cancel_btn = ttk.Button(buttons_frame, text="❌ Cancel", 
+        cancel_btn = ttk.Button(buttons_frame, text="Cancel", 
                                command=self.cancel_feedback)
         cancel_btn.grid(row=0, column=2)
         
         # Focus on feedback entry
         self.feedback_entry.focus()
         
+        # Bind Escape key to toggle maximized window
+        self.root.bind('<Escape>', self.toggle_fullscreen)
+        self.root.bind('<F11>', self.toggle_fullscreen)
+        
         # Start the GUI
         self.root.mainloop()
         
         return self.feedback if self.feedback is not None else ""
+    
+    def toggle_fullscreen(self, event=None):
+        """Toggle between maximized and normal window mode"""
+        try:
+            # Check current window state
+            current_state = self.root.state()
+            if current_state == 'zoomed':
+                self.root.state('normal')
+            else:
+                self.root.state('zoomed')
+        except:
+            try:
+                # Linux fallback - toggle zoomed attribute
+                current_state = self.root.attributes('-zoomed')
+                self.root.attributes('-zoomed', not current_state)
+            except:
+                try:
+                    # Alternative method
+                    current_state = self.root.wm_state()
+                    if current_state == 'zoomed':
+                        self.root.wm_state('normal')
+                    else:
+                        self.root.wm_state('zoomed')
+                except:
+                    pass
     
     def copy_conversation(self):
         """Copy conversation to clipboard"""
@@ -174,7 +295,7 @@ Please provide your feedback below:"""
                                 break
                         
                         if last_user and last_assistant:
-                            return f"""📝 Previous Conversation:
+                            return f"""Previous Conversation:
 ```
 user: {last_user}
 agent: {last_assistant}
@@ -188,15 +309,15 @@ agent: {last_assistant}
                                 break
                         
                         if last_user:
-                            return f"""📝 Previous User Request:
+                            return f"""Previous User Request:
 ```
 user: {last_user}
 ```"""
             
-            return "📝 Previous Conversation: No previous conversation found."
+            return "Previous Conversation: No previous conversation found."
             
         except Exception as e:
-            return "📝 Previous Conversation: Error loading conversation history."
+            return "Previous Conversation: Error loading conversation history."
     
     def get_conversation_text_for_copy(self):
         """Get conversation text formatted for copying"""
@@ -280,10 +401,10 @@ user: {last_user}
     def get_terminal_input(self):
         """Fallback terminal input"""
         print(f"\n{'='*60}")
-        print("🎯 Interactive Feedback MCP")
+        print("Interactive Feedback MCP")
         print(f"{'='*60}")
-        print(f"📁 Project: {self.project_directory}")
-        print(f"💬 Prompt: {self.prompt}")
+        print(f"Project: {self.project_directory}")
+        print(f"Prompt: {self.prompt}")
         print(f"{'='*60}")
         print("Please provide your feedback (or press Enter to skip):")
         
